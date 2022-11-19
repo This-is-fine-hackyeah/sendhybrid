@@ -1,5 +1,6 @@
 from pathlib import Path
 from pydantic import BaseModel
+from app.models.document import DocumentState
 
 
 class DocumentCreate(BaseModel):
@@ -17,6 +18,7 @@ class Document(BaseModel):
     content_type: str
     path: str
     owner_id: int
+    state: DocumentState
 
     class Config:
         orm_mode = True
