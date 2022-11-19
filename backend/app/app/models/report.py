@@ -1,11 +1,15 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float, ARRAY
+from sqlalchemy import Boolean, Column, Integer, String, Float, ARRAY, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
 
 class Report(Base):
     """What checks failed"""
-    id = Column(Boolean, nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(Integer, ForeignKey("document.id"), nullable=False)
+    document = relationship("Document")
+
     format = Column(Boolean, nullable=False)
     orientation = Column(Boolean, nullable=False)
     pdf_version = Column(Boolean, nullable=False)
