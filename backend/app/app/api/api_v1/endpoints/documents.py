@@ -12,9 +12,9 @@ router = APIRouter()
 
 @router.post("/upload", response_model=schemas.Document)
 def upload_document(
+    file: UploadFile,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
-    file: UploadFile
 ) -> Any:
     """
     Upload document.

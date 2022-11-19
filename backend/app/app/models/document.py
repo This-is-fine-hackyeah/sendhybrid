@@ -15,4 +15,4 @@ class Document(Base):
     content_type = Column(String, nullable=False)
     path = Column(String, nullable=False)
     owner_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    owner = relationship("User", back_populates="documents")
+    owner = relationship("User")
