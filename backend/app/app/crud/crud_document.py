@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional, Union
-from path import Path
+from pathlib import Path
 import shutil
 
 from sqlalchemy.orm import Session
