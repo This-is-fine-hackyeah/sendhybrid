@@ -9,11 +9,12 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
+from app.core.celery_app import celery_app
 
 router = APIRouter()
 
 
-@router.post("/upload", response_model=schemas.Document)
+@router.post("/upload")
 def upload_document(
     file: UploadFile = File(...),
     db: Session = Depends(deps.get_db),
@@ -29,7 +30,9 @@ def upload_document(
         owner_id=current_user.id
     )
     document = crud.document.create(db, obj_in=new_document, file=file.file)
-    return document
+    document_serializer = schemas.Document.from_orm(document)
+    celery_app.send_task("app.worker.check_file_type", args=[document_serializer.dict()])
+    return document_serializer
 
 @router.get("/{document_id}/download")
 def download_document(
