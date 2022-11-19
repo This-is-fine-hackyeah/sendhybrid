@@ -12,7 +12,7 @@ from app.schemas.document import DocumentCreate, DocumentUpdate
 class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
     def create(self, db: Session, *, obj_in: DocumentCreate, file: Any) -> Document:
         path = Path(obj_in.path)
-        path.mkdir(parents=True, exist_ok=True
+        path.mkdir(parents=True, exist_ok=True)
 
         with open(path, 'wb+') as out_file:
             shutil.copyfileobj(file, out_file)
