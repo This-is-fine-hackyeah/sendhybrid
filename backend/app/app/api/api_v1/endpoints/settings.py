@@ -18,7 +18,6 @@ def get_settings(
     db: Session = Depends(deps.get_db),
 ):
     ret = crud.settings.get_or_create(db)
-    print(ret)
     return schemas.Settings.from_orm(ret)
 
 
