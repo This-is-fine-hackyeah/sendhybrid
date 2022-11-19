@@ -11,14 +11,15 @@ from app.schemas.document import DocumentCreate, DocumentUpdate
 
 class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
     def create(self, db: Session, *, obj_in: DocumentCreate, file: Any) -> Document:
-        path = Path(obj_in.path)
+        path = Path(obj_in.path.parent)
         path.mkdir(parents=True, exist_ok=True)
 
-        with open(path, 'wb+') as out_file:
+        with open(obj_in.path, 'wb+') as out_file:
             shutil.copyfileobj(file, out_file)
 
         db_obj = Document(
-            **obj_in.dict()
+            path=str(obj_in.path),
+            **obj_in.dict(exclude={"path"})
         )
         db.add(db_obj)
         db.commit()
