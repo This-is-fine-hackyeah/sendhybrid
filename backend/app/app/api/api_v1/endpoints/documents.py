@@ -82,11 +82,22 @@ def add_document_metadata(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     """Add metadata to document"""
+    metadata_c = schemas.MetadataCreate(document_id=document_id, **metadata_s.dict())
+    metadata_o = crud.metadata.create(db, obj_in=metadata_c)
+    return metadata_o
+
+@router.get("/{document_id}/report", response_model=schemas.Report)
+def show_report(
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Download document.
+    """
     document = crud.document.get(db, document_id)
     if document is None or document.owner_id != current_user.id:
         raise HTTPException(
             status_code=404, detail="The document was not found"
         )
-    metadata_c = schemas.MetadataCreate(document_id=document_id, **metadata_s.dict())
-    metadata_o = crud.metadata.create(db, obj_in=metadata_c)
-    return schemas.Metadata.from_orm(metadata_o)
+    return document.report
