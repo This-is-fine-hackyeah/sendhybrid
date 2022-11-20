@@ -32,8 +32,9 @@ def is_pdf(filename: str, content_type: str) -> bool:
 @celery_app.task(acks_late=True)
 def check_file_type(document_data: dict):
     document = schemas.Document(**document_data)
-    if not is_pdf(document.filename, document.content_type):
-        pass
+    if is_pdf(document.filename, document.content_type):
+        celery_app.send_task("app.worker.validate_pdf", args=[document.id, document.owner_id])
+        return
 
     stem, ext = document.filename.rsplit(".", maxsplit=1)
     if ext in {
@@ -49,6 +50,11 @@ def check_file_type(document_data: dict):
         celery_app.send_task("app.worker.extract_zip", args=[document.id, document.owner_id])
         return
 
+@celery_app.task(acks_late=True)
+def validate_pdf(document_id: int, owner_id: int):
+    return
+    #with NamedTemporaryFile() as f:
+        #download_file(document_id, owner_id, f)
 
 
 def download_file(document_id: int, owner_id: int, fout: "file"):
