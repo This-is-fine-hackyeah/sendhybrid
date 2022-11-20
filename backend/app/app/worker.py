@@ -16,7 +16,7 @@ from app import schemas, crud
 from app.api import deps
 from app.processing.margins import verify_bottom_margin, verify_left_margin, \
     verify_right_margin, verify_top_margin
-from app.processing.size import verify_page_size
+from app.processing.size import get_page_size, verify_page_size
 from app.schemas import ConvertableFormats
 
 from app.processing.pdf import parse_metadata
@@ -75,13 +75,14 @@ def validate_pdf(document_id: int, owner_id: int):
         with PdfReader(f) as pdf:
             if not verify_page_size(pdf):
                 fails.append("size")
-            if not verify_top_margin(pdf):
+            width, height = get_page_size(pdf.getPage(0))
+            if not verify_top_margin(pdf, height):
                 fails.append("min_margin_top")
-            if not verify_bottom_margin(pdf):
+            if not verify_bottom_margin(pdf, height):
                 fails.append("min_margin_bottom")
-            if not verify_left_margin(pdf):
+            if not verify_left_margin(pdf, width):
                 fails.append("min_margin_left")
-            if not verify_right_margin(pdf):
+            if not verify_right_margin(pdf, width):
                 fails.append("min_margin_right")
         if fails:
             with get_db() as db:
