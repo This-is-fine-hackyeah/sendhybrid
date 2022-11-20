@@ -40,7 +40,8 @@ class Report(Base):
     pdf_version = Column(Boolean, nullable=True)
     min_margin_top = Column(Boolean, nullable=True)
     min_margin_bottom = Column(Boolean, nullable=True)
-    min_margin_side = Column(Boolean, nullable=True)
+    min_margin_left = Column(Boolean, nullable=True)
+    min_margin_right = Column(Boolean, nullable=True)
 
     protections_allowed = Column(Boolean, nullable=True)
 
