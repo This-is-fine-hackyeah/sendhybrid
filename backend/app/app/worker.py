@@ -86,13 +86,13 @@ def validate_pdf(document_id: int, owner_id: int):
             if not verify_page_size(pdf):
                 fails.append("size")
             width, height = get_page_size(pdf.getPage(0))
-            if not verify_top_margin(pdf, height):
+            if not verify_top_margin(f, height):
                 fails.append("min_margin_top")
-            if not verify_bottom_margin(pdf, height):
+            if not verify_bottom_margin(f, height):
                 fails.append("min_margin_bottom")
-            if not verify_left_margin(pdf, width):
+            if not verify_left_margin(f, width):
                 fails.append("min_margin_left")
-            if not verify_right_margin(pdf, width):
+            if not verify_right_margin(f, width):
                 fails.append("min_margin_right")
         if fails:
             with get_db() as db:
