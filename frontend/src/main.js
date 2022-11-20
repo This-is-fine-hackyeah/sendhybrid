@@ -9,16 +9,20 @@ import { routes } from '@/routes.js'
 import { Quasar } from 'quasar'
 import 'quasar/src/css/index.sass'
 import '@quasar/extras/material-icons/material-icons.css'
+import { createPinia } from 'pinia'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.VITE_BASE_PUBLIC_PATH),
-  base: process.env.BASE_URL,
   routes
 })
+
+const pinia = createPinia()
 
 const app = createApp(App)
 app.use(router)
 app.use(Quasar, {
   plugins: {}
 })
+app.use(pinia)
+
 app.mount('#app')

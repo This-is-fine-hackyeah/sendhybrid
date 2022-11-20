@@ -2,7 +2,7 @@ import MainPage from '@/pages/MainPage.vue'
 import NotFound from '@/pages/not-found.vue'
 
 export const routes = [
-  { path: '/', component: MainPage },
+  { path: '/', name: 'MainPage', component: MainPage },
   { path: '/:path(.*)', component: NotFound }
 ]
 
