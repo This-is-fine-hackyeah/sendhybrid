@@ -1,6 +1,7 @@
 import zipfile
 import requests
 from glob import glob
+from contextlib import contextmanager
 import subprocess
 from tempfile import TemporaryFile, NamedTemporaryFile, TemporaryDirectory
 from raven import Client
@@ -11,9 +12,12 @@ from app.core.celery_app import celery_app
 from app.core.config import settings
 from app.core.security import create_access_token
 from app import schemas, crud
+from app.api import deps
 from app.schemas import ConvertableFormats
 
 client_sentry = Client(settings.SENTRY_DSN)
+
+get_db = contextmanager(deps.get_db)
 
 
 @celery_app.task(acks_late=True)
@@ -49,6 +53,10 @@ def check_file_type(document_data: dict):
     if ext == ConvertableFormats.ZIP:
         celery_app.send_task("app.worker.extract_zip", args=[document.id, document.owner_id])
         return
+
+    with get_db() as db:
+        crud.document.mark_failed(db, validator_name="format", obj_in=document)
+
 
 @celery_app.task(acks_late=True)
 def validate_pdf(document_id: int, owner_id: int):
@@ -89,3 +97,4 @@ def extract_zip(document_id: int, owner_id: int):
         with zipfile.ZipFile(f, 'r') as zip_file:
             zip_file.extractall(tmpdir)
         upload_file(document_id, owner_id, glob(f"{tmpdir}/*.pdf").pop())
+

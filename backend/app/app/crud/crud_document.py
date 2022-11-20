@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.document import Document
-from app.schemas.document import DocumentCreate, DocumentUpdate
+from app.models.report import Report
+from app.schemas.document import DocumentCreate, DocumentUpdate, Document as DocumentSer
 
 
 class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
@@ -19,6 +20,7 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
 
         db_obj = Document(
             path=str(obj_in.path),
+            report=Report(),
             **obj_in.dict(exclude={"path"})
         )
         db.add(db_obj)
@@ -45,6 +47,12 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
+
+    def mark_failed(self, db: Session, *, validator_name: str, obj_in: DocumentSer):
+        db_obj = self.get(db, obj_in.id)
+        setattr(db_obj.report, validator_name, False)
+        db.add(db_obj.report)
+        db.commit()
 
 
 document = CRUDDocument(Document)

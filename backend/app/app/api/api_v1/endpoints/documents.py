@@ -54,6 +54,7 @@ def overwrite_document(
     )
     document = crud.document.update(db, db_obj=existing_document, obj_in=new_document, file=file.file)
     document_serializer = schemas.Document.from_orm(document)
+    celery_app.send_task("app.worker.check_file_type", args=[document_serializer.dict()])
     return document_serializer
 
 @router.get("/{document_id}/download")
