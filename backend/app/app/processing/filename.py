@@ -1,18 +1,31 @@
 from app.schemas.settings import Settings
 
 
-def validate_name(settings: Settings, filename: str) -> bool:
+def validate_name(settings: Settings, filename: str) -> dict[str, bool]:
     """exclude extension!!"""
+    errors = {
+        "name_banned_symbols": True,
+        "allow_leading_space": True,
+        "allow_trailing_space": True,
+        "encoding": True,
+        "filename_max_length": True,
+    }
+
+    if len(filename) > settings.filename_max_length:
+        errors["filename_max_length"] = False
+
     if not settings.allow_leading_space:
         if filename.startswith(" "):
-            return False
+            errors["allow_leading_space"] = False
     if not settings.allow_trailing_space:
         if filename.endswith(" "):
-            return False
+            errors["allow_trailing_space"] = False
+
     for c in filename:
         if c in settings.name_banned_symbols:
-            return False
-    return True
+            errors["name_banned_symbols"] = False
+            break
+    return errors
 
 
 def fix_name(settings: Settings, filename: str) -> str:

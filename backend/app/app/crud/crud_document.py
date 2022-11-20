@@ -54,5 +54,10 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
         db.add(db_obj.report)
         db.commit()
 
+    def mark_passed(self, db: Session, *, validator_name: str, obj_in: DocumentSer):
+        db_obj = self.get(db, obj_in.id)
+        setattr(db_obj.report, validator_name, True)
+        db.add(db_obj.report)
+        db.commit()
 
 document = CRUDDocument(Document)

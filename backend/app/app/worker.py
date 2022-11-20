@@ -17,6 +17,7 @@ from app.api import deps
 from app.processing.margins import verify_bottom_margin, verify_left_margin, \
     verify_right_margin, verify_top_margin
 from app.processing.size import get_page_size, verify_page_size
+from app.processing.filename import validate_name
 from app.schemas import ConvertableFormats
 
 from app.processing.pdf import parse_metadata
@@ -42,6 +43,15 @@ def is_pdf(filename: str, content_type: str) -> bool:
 @celery_app.task(acks_late=True)
 def check_file_type(document_data: dict):
     document = schemas.Document(**document_data)
+
+    with get_db() as db:
+        settings = crud.settings.get_or_create(db)
+        for error_name, error_value in validate_name(settings, document.filename).items():
+            if error_value:
+                crud.document.mark_passed(db, validator_name=error_name, obj_in=document)
+            else:
+                crud.document.mark_failed(db, validator_name=error_name, obj_in=document)
+
     if is_pdf(document.filename, document.content_type):
         celery_app.send_task("app.worker.validate_pdf", args=[document.id, document.owner_id])
         return
