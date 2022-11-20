@@ -1,7 +1,7 @@
 from app.schemas.settings import Settings
 
 
-def validate_name(settings: Settings, filename: str) -> dict[str, bool]:
+def validate_name(settings: Settings, filename: str):
     """exclude extension!!"""
     errors = {
         "name_banned_symbols": True,
