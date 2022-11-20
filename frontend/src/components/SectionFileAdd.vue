@@ -39,12 +39,15 @@
 <script setup lang="ts">
 import { outlinedAdd, outlinedAttachFile } from '@quasar/extras/material-icons-outlined'
 import { ref } from 'vue'
-import { api } from '@/api'
+import { useFileStore } from '@/store/Files'
 
+const { addFile } = useFileStore()
 const uploadedFiles = ref(null)
 
 const onFileUpload = () => {
-  api.sendFiles(uploadedFiles.value.files)
+  for (const file of uploadedFiles.value.files) {
+    addFile(file)
+  }
 }
 
 defineProps({

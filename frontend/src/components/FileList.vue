@@ -24,12 +24,20 @@
         class="col column flex-center text-dark-gray pt-10"
       >
         <div class="file-list-header">
-          <div class="row justify-between text-xs text-bold bg-white q-py-sm">
+          <div class="row text-xs text-bold bg-white q-py-sm">
             <div class="col-5 text-left q-pl-sm">
               Nazwa pliku
             </div>
-            <div class="col-4 text-left">
-              XXX
+            <div class="col-3 text-center">
+              Status zgodności
+            </div>
+            <div class="col-1 text-center">
+              Uwagi
+            </div>
+            <div class="col-1 text-center">
+            </div>
+            <div class="col-1 text-center">
+              Metadane
             </div>
           </div>
         </div>
@@ -57,7 +65,7 @@ import { storeToRefs } from 'pinia'
 const { isEmptyFileList, files } = storeToRefs(useFileStore())
 const { addFile } = useFileStore()
 
-const dropHandler = (ev) => {
+const dropHandler = async (ev) => {
   ev.preventDefault()
 
   if (ev.dataTransfer.items) {

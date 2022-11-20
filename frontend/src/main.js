@@ -6,7 +6,7 @@ import '@/assets/styles/tailwind.css'
 import App from '@/app.vue'
 import { routes } from '@/routes.js'
 
-import { Quasar } from 'quasar'
+import { Quasar, Dialog } from 'quasar'
 import 'quasar/src/css/index.sass'
 import '@quasar/extras/material-icons/material-icons.css'
 import { createPinia } from 'pinia'
@@ -21,7 +21,7 @@ const pinia = createPinia()
 const app = createApp(App)
 app.use(router)
 app.use(Quasar, {
-  plugins: {}
+  plugins: { Dialog }
 })
 app.use(pinia)
 

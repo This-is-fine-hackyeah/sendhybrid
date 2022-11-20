@@ -15,10 +15,10 @@ export const useFileStore = defineStore('fileStore', () => {
     files,
     isEmptyFileList,
 
-    addFile(file: File) {
-      api.sendFiles([file])
+    async addFile(file: File) {
       files.value.push({
-        name: file.name
+        name: file.name,
+        id: await api.sendFile(file)
       })
     }
 
