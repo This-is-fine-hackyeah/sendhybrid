@@ -1,3 +1,4 @@
+import zipfile
 import requests
 from glob import glob
 import subprocess
@@ -42,6 +43,12 @@ def check_file_type(document_data: dict):
             ConvertableFormats.DOCX,
     }:
         celery_app.send_task("app.worker.convert_libreoffice", args=[document.id, document.owner_id])
+        return
+
+    if ext == ConvertableFormats.ZIP:
+        celery_app.send_task("app.worker.extract_zip", args=[document.id, document.owner_id])
+        return
+
 
 
 def download_file(document_id: int, owner_id: int, fout: "file"):
@@ -67,4 +74,12 @@ def convert_libreoffice(document_id: int, owner_id: int):
         download_file(document_id, owner_id, f)
         cmd = f"lowriter --headless --convert-to pdf {f.name} --outdir {tmpdir}"
         subprocess.run(cmd, shell=True)
+        upload_file(document_id, owner_id, glob(f"{tmpdir}/*.pdf").pop())
+
+@celery_app.task(acks_late=True)
+def extract_zip(document_id: int, owner_id: int):
+    with NamedTemporaryFile() as f, TemporaryDirectory() as tmpdir:
+        download_file(document_id, owner_id, f)
+        with zipfile.ZipFile(f, 'r') as zip_file:
+            zip_file.extractall(tmpdir)
         upload_file(document_id, owner_id, glob(f"{tmpdir}/*.pdf").pop())
