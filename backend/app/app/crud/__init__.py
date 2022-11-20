@@ -1,10 +1,12 @@
 from .crud_item import item
 from .crud_user import user
+from .crud_settings import settings
+from .crud_document import document
+from .crud_report import report
 
-# For a new basic set of CRUD operations you could just do
+from .base import CRUDBase
+from app.models.report import Metadata
+from app.schemas.report import Metadata as MetadataS
+from app.schemas.report import MetadataCreate
 
-# from .base import CRUDBase
-# from app.models.item import Item
-# from app.schemas.item import ItemCreate, ItemUpdate
-
-# item = CRUDBase[Item, ItemCreate, ItemUpdate](Item)
+metadata = CRUDBase[Metadata, MetadataCreate, MetadataS](Metadata)
