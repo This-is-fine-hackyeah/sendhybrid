@@ -22,7 +22,7 @@ ARG INSTALL_JUPYTER=false
 RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 
 ENV C_FORCE_ROOT=1
-
+RUN apt-get update && apt-get --no-install-recommends install -y openjdk-11-jre libreoffice libreoffice-java-common
 COPY ./app /app
 WORKDIR /app
 

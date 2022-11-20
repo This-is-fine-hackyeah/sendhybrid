@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
 from app.models.document import DocumentState
@@ -10,7 +11,9 @@ class DocumentCreate(BaseModel):
     owner_id: int
 
 class DocumentUpdate(BaseModel):
-    pass
+    id: int
+    filename: str
+    content_type: str
 
 class Document(BaseModel):
     id: int
@@ -22,3 +25,13 @@ class Document(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ConvertableFormats(str, Enum):
+    ZIP = "zip"
+    XML = "xml"
+
+    PPTX = "pptx"
+    ODT = "odt"
+    XLS = "xls"
+    DOCX = "docx"

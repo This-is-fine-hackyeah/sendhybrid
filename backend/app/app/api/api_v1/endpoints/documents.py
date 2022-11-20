@@ -34,6 +34,28 @@ def upload_document(
     celery_app.send_task("app.worker.check_file_type", args=[document_serializer.dict()])
     return document_serializer
 
+@router.put("/{document_id}/upload")
+def overwrite_document(
+    document_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Overwrite document.
+    """
+    existing_document = crud.document.get(db, document_id)
+    old_stem, _old_ext = existing_document.filename.rsplit(".", maxsplit=1)
+    _new_stem, new_ext = file.filename.rsplit(".", maxsplit=1)
+    new_document = schemas.DocumentUpdate(
+        id=document_id,
+        filename=f"{old_stem}.{new_ext}",
+        content_type=file.content_type,
+    )
+    document = crud.document.update(db, db_obj=existing_document, obj_in=new_document, file=file.file)
+    document_serializer = schemas.Document.from_orm(document)
+    return document_serializer
+
 @router.get("/{document_id}/download")
 def download_document(
     document_id: int,

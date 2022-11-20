@@ -10,7 +10,6 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
 
-
 class DocumentState(str, Enum):
     UPLOADED = "uploaded"
     ACCEPT_CONVERSION = "accept_conversion"
