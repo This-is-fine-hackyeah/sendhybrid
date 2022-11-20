@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.core.security import create_access_token
 from app import schemas, crud
 from app.api import deps
+from app.processing.size import verify_page_size
 from app.schemas import ConvertableFormats
 
 from app.processing.pdf import parse_metadata
@@ -67,6 +68,17 @@ def validate_pdf(document_id: int, owner_id: int):
         download_file(document_id, owner_id, f)
         metadata = parse_metadata(f.name)
         add_metadata(document_id, owner_id, metadata)
+
+        fails = []
+        with PdfReader(f) as pdf:
+            if not verify_page_size(pdf):
+                fails.append("size")
+        if fails:
+            with get_db() as db:
+                for validator in fails:
+                    crud.document.mark_failed(
+                        db, validator_name=validator, document_id=document_id
+                    )
 
 def add_metadata(document_id: int, owner_id: int, metadata: schemas.Metadata):
     token = create_access_token(owner_id)

@@ -36,7 +36,7 @@ class Report(Base):
     document = relationship("Document", back_populates="report")
 
     format = Column(Boolean, nullable=True)
-    orientation = Column(Boolean, nullable=True)
+    size = Column(Boolean, nullable=True)
     pdf_version = Column(Boolean, nullable=True)
     min_margin_top = Column(Boolean, nullable=True)
     min_margin_bottom = Column(Boolean, nullable=True)
