@@ -8,12 +8,15 @@ from raven import Client
 
 from PyPDF2 import PdfReader
 from PyPDF2.errors import PdfReadError
+from fastapi.encoders import jsonable_encoder
 from app.core.celery_app import celery_app
 from app.core.config import settings
 from app.core.security import create_access_token
 from app import schemas, crud
 from app.api import deps
 from app.schemas import ConvertableFormats
+
+from app.processing.pdf import parse_metadata
 
 client_sentry = Client(settings.SENTRY_DSN)
 
@@ -60,9 +63,17 @@ def check_file_type(document_data: dict):
 
 @celery_app.task(acks_late=True)
 def validate_pdf(document_id: int, owner_id: int):
-    return
-    #with NamedTemporaryFile() as f:
-        #download_file(document_id, owner_id, f)
+    with NamedTemporaryFile() as f:
+        download_file(document_id, owner_id, f)
+        metadata = parse_metadata(f.name)
+        add_metadata(document_id, owner_id, metadata)
+
+def add_metadata(document_id: int, owner_id: int, metadata: schemas.Metadata):
+    token = create_access_token(owner_id)
+    headers = {"Authorization": f"Bearer {token}"}
+    url = f"http://backend{settings.API_V1_STR}/documents/{document_id}/metadata"
+    r = requests.post(url, json=jsonable_encoder(metadata), headers=headers)
+    r.raise_for_status()
 
 
 def download_file(document_id: int, owner_id: int, fout: "file"):

@@ -89,4 +89,4 @@ def add_document_metadata(
         )
     metadata_c = schemas.MetadataCreate(document_id=document_id, **metadata_s.dict())
     metadata_o = crud.metadata.create(db, obj_in=metadata_c)
-    return metadata_o
+    return schemas.Metadata.from_orm(metadata_o)

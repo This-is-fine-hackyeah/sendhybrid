@@ -3,9 +3,9 @@ import re
 import PyPDF2
 
 from app.models.settings import Settings
-from app.schemas.report import Report
+from app.schemas.report import Report, Metadata
 
-def parse_metadata(filepath: str) -> dict[str, str]:
+def parse_metadata(filepath: str) -> Metadata:
     ret = {}
     pdf = PyPDF2.PdfReader(filepath)
     for p in pdf.pages:
@@ -80,6 +80,4 @@ def parse_metadata(filepath: str) -> dict[str, str]:
             (nip,) = match_inf.groups()
             ret["nip"] = nip.strip()
 
-
-
-    return ret
+    return Metadata(**ret)

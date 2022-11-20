@@ -21,6 +21,8 @@ class Metadata(BaseModel):
     date: Optional[str]
     nip: Optional[str]
 
+    class Config:
+        orm_mode=True
 
 class MetadataCreate(Metadata):
     document_id: int
