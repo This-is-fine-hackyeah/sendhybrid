@@ -4,3 +4,4 @@ from .token import Token, TokenPayload
 from .user import User, UserCreate, UserInDB, UserUpdate
 from .settings import Settings, SettingsUpdate
 from .document import Document, DocumentCreate, ConvertableFormats, DocumentUpdate
+from .report import Metadata, MetadataCreate

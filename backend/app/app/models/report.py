@@ -4,6 +4,31 @@ from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
 
+class Metadata(Base):
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(Integer, ForeignKey("document.id"), nullable=False)
+    document = relationship("Document")
+
+    receiver_name = Column(String)
+    receiver_name2 = Column(String)
+    receiver_last_name = Column(String)
+    receiver_address = Column(String)
+    receiver_pesel = Column(String)
+
+    sender_name = Column(String)
+    sender_name2 = Column(String)
+    sender_phone = Column(String)
+    sender_email = Column(String)
+    sender_epuap = Column(String)
+    sender_address = Column(String)
+
+    unp = Column(String)
+    znak_sprawy = Column(String)
+    tytul_sprawy = Column(String)
+    date = Column(String)
+    nip = Column(String)
+
+
 class Report(Base):
     """What checks failed"""
     id = Column(Integer, primary_key=True)

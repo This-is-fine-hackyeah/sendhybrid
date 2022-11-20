@@ -1,6 +1,30 @@
 from pydantic import BaseModel
 from typing import Optional
 
+class Metadata(BaseModel):
+    receiver_name: Optional[str]
+    receiver_name2: Optional[str]
+    receiver_last_name: Optional[str]
+    receiver_address: Optional[str]
+    receiver_pesel: Optional[str]
+
+    sender_name: Optional[str]
+    sender_name2: Optional[str]
+    sender_phone: Optional[str]
+    sender_email: Optional[str]
+    sender_epuap: Optional[str]
+    sender_address: Optional[str]
+
+    unp: Optional[str]
+    znak_sprawy: Optional[str]
+    tytul_sprawy: Optional[str]
+    date: Optional[str]
+    nip: Optional[str]
+
+
+class MetadataCreate(Metadata):
+    document_id: int
+
 
 class Report(BaseModel):
     format: bool

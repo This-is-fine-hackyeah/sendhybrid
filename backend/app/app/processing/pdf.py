@@ -19,21 +19,20 @@ def parse_metadata(filepath: str) -> dict[str, str]:
             name = name.strip()
             name2 = name2 or ""
             name2 = name2.strip()
-            ret["r_name"] = name.strip()
-            ret["r_name2"] = name2.strip()
-            ret["r_last_name"] = last_name.strip()
-            ret["r_address1"] = address1.strip()
-            ret["r_address2"] = address2.strip()
+            ret["receiver_name"] = name.strip()
+            ret["receiver_name2"] = name2.strip()
+            ret["receiver_last_name"] = last_name.strip()
+            ret["receiver_address"] = ",".join([address1.strip(), address2.strip()])
 
         match_inf = re.search(r"(\w+)\s(\w*\s)?(\w+)\s+PESEL:\s*(\d{11})", t)
         if match_inf:
             (name, name2, last_name, pesel) = match_inf.groups()
             name2 = name2 or ""
             name2 = name2.strip()
-            ret["r_name"] = name.strip()
-            ret["r_name2"] = name2.strip()
-            ret["r_last_name"] = last_name.strip()
-            ret["r_pesel"] = pesel.strip()
+            ret["receiver_name"] = name.strip()
+            ret["receiver_name2"] = name2.strip()
+            ret["receiver_last_name"] = last_name.strip()
+            ret["receiver_pesel"] = pesel.strip()
 
         # unp
         match_inf = re.search(r"UNP:\s?(\d{6}-\d\d-\d{6})", t)
@@ -63,17 +62,17 @@ def parse_metadata(filepath: str) -> dict[str, str]:
         match_inf = re.search(r"Kontakt:\s?([\w ]+)\n.*\ntel\.?\s(\+[\d ]+)\n(.*)", t)
         if match_inf:
             (name, phone, email) = match_inf.groups()
-            ret["s_name"] = name.strip()
-            ret["s_phone"] = phone.strip()
-            ret["s_email"] = email.strip()
+            ret["sender_name"] = name.strip()
+            ret["sender_phone"] = phone.strip()
+            ret["sender_email"] = email.strip()
 
         # sender2
         match_inf = re.search(r"e-mail:\s?([\w.]+@[\w.]+).*ePUAP\s(\/\w+\/\w+).*(?:[\w.]+)\s([\w ]+),(.*)\n?", t)
         if match_inf:
             (email, epuap, name, address) = match_inf.groups()
-            ret["s_epuap"] = epuap.strip()
-            ret["s_name2"] = name.strip()
-            ret["s_address"] = address.strip()
+            ret["sender_epuap"] = epuap.strip()
+            ret["sender_name2"] = name.strip()
+            ret["sender_address"] = address.strip()
 
         # nip
         match_inf = re.search(r"NIP:?\s?(\d{3}-\d{3}-\d{2}-\d{2})", t)

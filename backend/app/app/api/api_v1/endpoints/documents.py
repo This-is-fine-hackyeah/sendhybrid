@@ -72,3 +72,21 @@ def download_document(
             status_code=404, detail="The document was not found"
         )
     return FileResponse(document.path, media_type='application/octet-stream', filename=document.filename)
+
+
+@router.post("/{document_id}/metadata", response_model=schemas.Metadata)
+def add_document_metadata(
+    document_id: int,
+    metadata_s: schemas.Metadata,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    """Add metadata to document"""
+    document = crud.document.get(db, document_id)
+    if document is None or document.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=404, detail="The document was not found"
+        )
+    metadata_c = schemas.MetadataCreate(document_id=document_id, **metadata_s.dict())
+    metadata_o = crud.metadata.create(db, obj_in=metadata_c)
+    return metadata_o
