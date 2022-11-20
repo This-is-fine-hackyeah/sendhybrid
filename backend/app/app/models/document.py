@@ -27,3 +27,4 @@ class Document(Base):
     owner_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     owner = relationship("User")
     state = Column(EnumSQL(DocumentState), default=DocumentState.UPLOADED, nullable=False)
+    report = relationship("Report", back_populates="document")
