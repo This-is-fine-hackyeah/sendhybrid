@@ -48,9 +48,9 @@ def check_file_type(document_data: dict):
         settings = crud.settings.get_or_create(db)
         for error_name, error_value in validate_name(settings, document.filename).items():
             if error_value:
-                crud.document.mark_passed(db, validator_name=error_name, obj_in=document)
+                crud.document.mark_passed(db, validator_name=error_name, document_id=document.id)
             else:
-                crud.document.mark_failed(db, validator_name=error_name, obj_in=document)
+                crud.document.mark_failed(db, validator_name=error_name, document_id=document.id)
 
     if is_pdf(document.filename, document.content_type):
         celery_app.send_task("app.worker.validate_pdf", args=[document.id, document.owner_id])
@@ -71,29 +71,31 @@ def check_file_type(document_data: dict):
         return
 
     with get_db() as db:
-        crud.document.mark_failed(db, validator_name="format", obj_in=document)
+        crud.document.mark_failed(db, validator_name="format", document_id=document.id)
 
 
 @celery_app.task(acks_late=True)
 def validate_pdf(document_id: int, owner_id: int):
     with NamedTemporaryFile() as f:
+        file_name = f.name
         download_file(document_id, owner_id, f)
-        metadata = parse_metadata(f.name)
+        metadata = parse_metadata(file_name)
         add_metadata(document_id, owner_id, metadata)
 
         fails = []
-        with PdfReader(f) as pdf:
-            if not verify_page_size(pdf):
-                fails.append("size")
-            width, height = get_page_size(pdf.getPage(0))
-            if not verify_top_margin(f, height):
-                fails.append("min_margin_top")
-            if not verify_bottom_margin(f, height):
-                fails.append("min_margin_bottom")
-            if not verify_left_margin(f, width):
-                fails.append("min_margin_left")
-            if not verify_right_margin(f, width):
-                fails.append("min_margin_right")
+        pdf = PdfReader(file_name)
+        if not verify_page_size(pdf):
+            fails.append("size")
+        width, height = get_page_size(pdf.getPage(0))
+        if not verify_top_margin(file_name, height):
+            fails.append("min_margin_top")
+        if not verify_bottom_margin(file_name, height):
+            fails.append("min_margin_bottom")
+        if not verify_left_margin(file_name, width):
+            fails.append("min_margin_left")
+        if not verify_right_margin(file_name, width):
+            fails.append("min_margin_right")
+
         if fails:
             with get_db() as db:
                 for validator in fails:

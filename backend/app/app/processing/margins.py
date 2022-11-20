@@ -17,13 +17,13 @@ def verify_size_after_crop(
     with TemporaryDirectory() as tmpdir:
         out_file = os.path.join(tmpdir, file)
         crop(["-p4", str(left), str(bottom), str(right), str(top), "-o", out_file, file])
-        with PdfReader(out_file) as pdf:
-            for page in pdf.pages:
-                width, height = get_page_size(page)
-                if max_width is not None and width > max_width:
-                    return False
-                if max_height is not None and height > max_height:
-                    return False
+        pdf = PdfReader(str(out_file))
+        for page in pdf.pages:
+            width, height = get_page_size(page)
+            if max_width is not None and width > max_width:
+                return False
+            if max_height is not None and height > max_height:
+                return False
     return True
 
 

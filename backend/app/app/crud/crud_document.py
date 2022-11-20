@@ -48,14 +48,14 @@ class CRUDDocument(CRUDBase[Document, DocumentCreate, DocumentUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def mark_failed(self, db: Session, *, validator_name: str, obj_in: DocumentSer):
-        db_obj = self.get(db, obj_in.id)
+    def mark_failed(self, db: Session, *, validator_name: str, document_id: int):
+        db_obj = self.get(db, document_id)
         setattr(db_obj.report, validator_name, False)
         db.add(db_obj.report)
         db.commit()
 
-    def mark_passed(self, db: Session, *, validator_name: str, obj_in: DocumentSer):
-        db_obj = self.get(db, obj_in.id)
+    def mark_passed(self, db: Session, *, validator_name: str, document_id: int):
+        db_obj = self.get(db, document_id)
         setattr(db_obj.report, validator_name, True)
         db.add(db_obj.report)
         db.commit()

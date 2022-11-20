@@ -5,7 +5,7 @@ from PyPDF2 import PageObject, PdfReader
 
 def dots_to_cm(dots: float, dpi: int = 72, cms_inch: float = 2.54):
     """Convert dots to cm"""
-    return dots / dpi * cms_inch
+    return float(dots / dpi) * cms_inch
 
 
 def get_page_size(page: PageObject) -> Tuple[float, float]:
